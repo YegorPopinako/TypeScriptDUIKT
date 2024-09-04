@@ -1,10 +1,9 @@
-const readline = require('readline');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-function getInput(query) {
+function getInput(query: string): Promise<string> {
     return new Promise((resolve) => {
         rl.question(query, (answer) => {
             resolve(answer);
@@ -12,16 +11,16 @@ function getInput(query) {
     });
 }
 
-function getRandomInt(min, max) {
+function getRandomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateWord() {
-    const words = ["javascript", "programming", "function", "variable", "object", "array", "loop", "condition", "string", "number", "algorithm", "debugging", "syntax", "console", "error", "exception", "module", "package", "framework", "library"];
+function generateWord(): string {
+    const words: string[] = ["javascript", "programming", "function", "variable", "object", "array", "loop", "condition", "string", "number", "algorithm", "debugging", "syntax", "console", "error", "exception", "module", "package", "framework", "library"];
     return words[getRandomInt(0, words.length - 1)];
 }
 
-function displayWord(word, guesses) {
+function displayWord(word: string, guesses: string[]): string {
     let display = "";
     for (let char of word) {
         if (guesses.includes(char)) {
@@ -33,17 +32,17 @@ function displayWord(word, guesses) {
     return display;
 }
 
-function provideHint(word, guesses, random = false) {
-    const unguessedLetters = word.split('').filter(char => !guesses.includes(char));
+function provideHint(word: string, guesses: string[], random: boolean = false): string {
+    const unguessedLetters: string[] = word.split('').filter(char => !guesses.includes(char));
     if (unguessedLetters.length > 0) {
-        const hintLetter = random ? unguessedLetters[getRandomInt(0, unguessedLetters.length - 1)] : unguessedLetters[0];
+        const hintLetter: string = random ? unguessedLetters[getRandomInt(0, unguessedLetters.length - 1)] : unguessedLetters[0];
         return `Hint: The word contains the letter '${hintLetter}'`;
     }
     return "No hints available.";
 }
 
-async function getLevel() {
-    const level = parseInt(await getInput("Enter difficulty level (1 - Easy, 2 - Medium, 3 - Hard): "), 10);
+async function getLevel(): Promise<number> {
+    const level: number = parseInt(await getInput("Enter difficulty level (1 - Easy, 2 - Medium, 3 - Hard): "), 10);
     if (isNaN(level) || level < 1 || level > 3) {
         console.log("Invalid level. Defaulting to Easy.");
         return 1;
@@ -51,8 +50,8 @@ async function getLevel() {
     return level;
 }
 
-async function getGameMode() {
-    const mode = parseInt(await getInput("Select game mode (1 - Classic, 2 - Timed): "), 10);
+async function getGameMode(): Promise<number> {
+    const mode: number = parseInt(await getInput("Select game mode (1 - Classic, 2 - Timed): "), 10);
     if (isNaN(mode) || mode < 1 || mode > 2) {
         console.log("Invalid mode. Defaulting to Classic.");
         return 1;
@@ -60,7 +59,7 @@ async function getGameMode() {
     return mode;
 }
 
-function getMaxAttempts(level) {
+function getMaxAttempts(level: number): number {
     switch (level) {
         case 1:
             return 10;
@@ -73,13 +72,18 @@ function getMaxAttempts(level) {
     }
 }
 
-function displayScore(score) {
+function displayScore(score: number): void {
     console.log(`Current score: ${score}`);
 }
 
-function saveProfile(name, score) {
-    const fs = require('fs');
-    let profiles = {};
+interface Profile {
+    gamesPlayed: number;
+    gamesWon: number;
+    totalScore: number;
+}
+
+function saveProfile(name: string, score: number): void {
+    let profiles: { [key: string]: Profile } = {};
     try {
         profiles = JSON.parse(fs.readFileSync('profiles.json', 'utf8'));
     } catch (err) {
@@ -93,28 +97,26 @@ function saveProfile(name, score) {
     fs.writeFileSync('profiles.json', JSON.stringify(profiles, null, 2));
 }
 
-function displayProfile(name) {
-    const fs = require('fs');
-    let profiles = {};
+function displayProfile(name: string): void {
+    let profiles: { [key: string]: Profile } = {};
     try {
         profiles = JSON.parse(fs.readFileSync('profiles.json', 'utf8'));
     } catch (err) {
     }
-    const profile = profiles[name] || { gamesPlayed: 0, gamesWon: 0, totalScore: 0 };
+    const profile: Profile = profiles[name] || { gamesPlayed: 0, gamesWon: 0, totalScore: 0 };
     console.log(`Profile: ${name}`);
     console.log(`Games Played: ${profile.gamesPlayed}`);
     console.log(`Games Won: ${profile.gamesWon}`);
     console.log(`Total Score: ${profile.totalScore}`);
 }
 
-function displayLeaderboard() {
-    const fs = require('fs');
-    let profiles = {};
+function displayLeaderboard(): void {
+    let profiles: { [key: string]: Profile } = {};
     try {
         profiles = JSON.parse(fs.readFileSync('profiles.json', 'utf8'));
     } catch (err) {
     }
-    const leaderboard = Object.entries(profiles)
+    const leaderboard: [string, Profile][] = Object.entries(profiles)
         .sort(([, a], [, b]) => b.totalScore - a.totalScore)
         .slice(0, 5);
 
@@ -124,30 +126,30 @@ function displayLeaderboard() {
     });
 }
 
-async function playTimedGame() {
-    const name = await getInput("Enter your name: ");
-    const level = await getLevel();
-    const maxAttempts = getMaxAttempts(level);
-    const word = generateWord();
-    let guesses = [];
-    let attempts = maxAttempts;
-    let guessedWord = displayWord(word, guesses);
-    let score = 0;
+async function playTimedGame(): Promise<void> {
+    const name: string = await getInput("Enter your name: ");
+    const level: number = await getLevel();
+    const maxAttempts: number = getMaxAttempts(level);
+    const word: string = generateWord();
+    let guesses: string[] = [];
+    let attempts: number = maxAttempts;
+    let guessedWord: string = displayWord(word, guesses);
+    let score: number = 0;
 
     console.log("Welcome to the Timed Word Guessing Game!");
     console.log(`Word: ${guessedWord}`);
 
-    const startTime = Date.now();
-    const timeLimit = 60 * 1000;
+    const startTime: number = Date.now();
+    const timeLimit: number = 60 * 1000;
 
     while (attempts > 0 && guessedWord.includes("_")) {
-        const elapsedTime = Date.now() - startTime;
+        const elapsedTime: number = Date.now() - startTime;
         if (elapsedTime > timeLimit) {
             console.log("Time's up!");
             break;
         }
 
-        const guess = (await getInput("Guess a letter: ")).toLowerCase();
+        const guess: string = (await getInput("Guess a letter: ")).toLowerCase();
 
         if (guess.length !== 1 || !/^[a-z]$/.test(guess)) {
             console.log("Please enter a single letter.");
@@ -195,29 +197,29 @@ async function playTimedGame() {
     }
 }
 
-async function playGame() {
-    const name = await getInput("Enter your name: ");
-    const gameMode = await getGameMode();
+async function playGame(): Promise<void> {
+    const name: string = await getInput("Enter your name: ");
+    const gameMode: number = await getGameMode();
 
     if (gameMode === 2) {
         await playTimedGame();
         return;
     }
 
-    const level = await getLevel();
-    const maxAttempts = getMaxAttempts(level);
-    const word = generateWord();
-    let guesses = [];
-    let attempts = maxAttempts;
-    let guessedWord = displayWord(word, guesses);
-    let score = 0;
+    const level: number = await getLevel();
+    const maxAttempts: number = getMaxAttempts(level);
+    const word: string = generateWord();
+    let guesses: string[] = [];
+    let attempts: number = maxAttempts;
+    let guessedWord: string = displayWord(word, guesses);
+    let score: number = 0;
 
     console.log("Welcome to the Classic Word Guessing Game!");
     console.log(`Word: ${guessedWord}`);
     console.log(provideHint(word, guesses));
 
     while (attempts > 0 && guessedWord.includes("_")) {
-        const guess = (await getInput("Guess a letter: ")).toLowerCase();
+        const guess: string = (await getInput("Guess a letter: ")).toLowerCase();
 
         if (guess.length !== 1 || !/^[a-z]$/.test(guess)) {
             console.log("Please enter a single letter.");
