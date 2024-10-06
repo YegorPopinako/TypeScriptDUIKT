@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University management</title>
+</head>
+<body>
+
+<h1>Add Professor</h1>
+<form id="professorForm">
+  <label for="professorId">ID:</label>
+  <input type="number" id="professorId" required>
+  <br><br>
+
+  <label for="professorName">Name:</label>
+  <input type="text" id="professorName" required>
+  <br><br>
+
+  <label for="professorDepartment">Department:</label>
+  <input type="text" id="professorDepartment" required>
+  <br><br>
+
+  <button type="submit">Add Professor</button>
+</form>
+
+<div class="professor-list" id="professorList">
+  <h2>Professors:</h2>
+</div>
+
+<h2>Add Lesson</h2>
+<form id="lessonForm">
+  <input type="number" id="courseId" placeholder="Course ID" required>
+  <input type="number" id="professorIdLesson" placeholder="Professor ID" required>
+  <input type="text" id="classroomNumber" placeholder="Classroom Number" required>
+  <select id="dayOfWeek" required>
+    <option value="">Select Day of the Week</option>
+    <option value="Monday">Monday</option>
+    <option value="Tuesday">Tuesday</option>
+    <option value="Wednesday">Wednesday</option>
+    <option value="Thursday">Thursday</option>
+    <option value="Friday">Friday</option>
+  </select>
+  <select id="timeSlot" required>
+    <option value="">Select Time Slot</option>
+    <option value="8:30-10:00">8:30-10:00</option>
+    <option value="10:15-11:45">10:15-11:45</option>
+    <option value="12:15-13:45">12:15-13:45</option>
+    <option value="14:00-15:30">14:00-15:30</option>
+    <option value="15:45-17:15">15:45-17:15</option>
+  </select>
+  <select id="courseType" required>
+    <option value="">Select Course Type</option>
+    <option value="Lecture">Lecture</option>
+    <option value="Seminar">Seminar</option>
+    <option value="Lab">Lab</option>
+    <option value="Practice">Practice</option>
+  </select>
+  <button type="submit">Add Lesson</button>
+</form>
+
+<h2>List of Lessons</h2>
+<table id="lessonTable">
+  <thead>
+  <tr>
+    <th>Course ID</th>
+    <th>Professor ID</th>
+    <th>Classroom Number</th>
+    <th>Day of the Week</th>
+    <th>Time Slot</th>
+    <th>Course Type</th>
+    <th>Course Name</th>
+  </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<h2>Get Professor Schedule</h2>
+<form id="scheduleForm">
+  <input type="number" id="professorIdSchedule" placeholder="Professor ID" required>
+  <button type="submit">Get Schedule</button>
+</form>
+
+<div id="scheduleList">
+  <h2>Professor's Schedule:</h2>
+  <ul id="scheduleItems"></ul>
+</div>
+
+<h2>Find Available Classrooms</h2>
+<form id="availableClassroomsForm">
+  <select id="availableDayOfWeek" required>
+    <option value="">Select Day of the Week</option>
+    <option value="Monday">Monday</option>
+    <option value="Tuesday">Tuesday</option>
+    <option value="Wednesday">Wednesday</option>
+    <option value="Thursday">Thursday</option>
+    <option value="Friday">Friday</option>
+  </select>
+  <select id="availableTimeSlot" required>
+    <option value="">Select Time Slot</option>
+    <option value="8:30-10:00">8:30-10:00</option>
+    <option value="10:15-11:45">10:15-11:45</option>
+    <option value="12:15-13:45">12:15-13:45</option>
+    <option value="14:00-15:30">14:00-15:30</option>
+    <option value="15:45-17:15">15:45-17:15</option>
+  </select>
+  <button type="submit">Find Available Classrooms</button>
+</form>
+
+<div id="availableClassroomsList">
+  <h2>Available Classrooms:</h2>
+  <ul id="availableClassroomsItems"></ul>
+</div>
+
+<h2>Get Classroom Utilization</h2>
+<form id="utilizationForm">
+  <input type="text" id="classroomNumberUtilization" placeholder="Classroom Number" required>
+  <button type="submit">Get Utilization</button>
+</form>
+
+<div id="utilizationResult">
+  <h2>Classroom Utilization:</h2>
+  <p id="utilizationPercentage"></p>
+</div>
+
+<h2>Most Popular Course Type</h2>
+<button id="getMostPopularCourseType">Get Most Popular Course Type</button>
+<p id="mostPopularCourseType"></p>
+
+<form id="reassignClassroomForm">
+  <label for="lessonId">Lesson ID:</label>
+  <input type="number" id="lessonId" required>
+
+  <label for="newClassroomNumber">New Classroom Number:</label>
+  <input type="text" id="newClassroomNumber" required>
+
+  <button type="submit">Reassign Classroom</button>
+</form>
+<div id="reassignmentResult"></div>
+
+<h2>Cancel Lesson</h2>
+<form id="cancelLessonForm">
+  <label for="lessonIdToCancel">Lesson ID:</label>
+  <input type="number" id="lessonIdToCancel" required>
+  <button type="submit">Cancel Lesson</button>
+</form>
+<div id="cancelResult"></div>
+
+<script src="main.js"></script>
+<script>
+
+  document.getElementById('professorForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const id = parseInt(document.getElementById('professorId').value);
+    const name = document.getElementById('professorName').value;
+    const department = document.getElementById('professorDepartment').value;
+
+    const newProfessor = { id, name, department };
+    addProfessor(newProfessor);
+    displayProfessors();
+
+    this.reset();
+  });
+
+  function displayProfessors() {
+    const professorList = document.getElementById('professorList');
+    professorList.innerHTML = '<h2>Professors:</h2>';
+
+    professors.forEach(professor => {
+      const professorItem = document.createElement('div');
+      professorItem.className = 'professor-item';
+      professorItem.textContent = `ID: ${professor.id}, Name: ${professor.name}, Department: ${professor.department}`;
+      professorList.appendChild(professorItem);
+    });
+  }
+
+  let nextLessonId = 1;
+
+  document.getElementById('lessonForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const courseId = Number(document.getElementById('courseId').value);
+    const courseName = prompt("Enter course name:");
+    const courseType = document.getElementById('courseType').value;
+
+    const course = {
+      id: courseId,
+      name: courseName,
+      type: courseType
+    };
+
+    addCourse(course);
+
+    const lesson = {
+      id: nextLessonId++,
+      courseId: courseId,
+      professorId: Number(document.getElementById('professorIdLesson').value),
+      classroomNumber: document.getElementById('classroomNumber').value,
+      dayOfWeek: document.getElementById('dayOfWeek').value,
+      timeSlot: document.getElementById('timeSlot').value
+    };
+
+    if (addLesson(lesson)) {
+      const lessonTableBody = document.getElementById('lessonTable').getElementsByTagName('tbody')[0];
+      const row = lessonTableBody.insertRow();
+      row.insertCell(0).textContent = lesson.courseId.toString();
+      row.insertCell(1).textContent = lesson.professorId.toString();
+      row.insertCell(2).textContent = lesson.classroomNumber;
+      row.insertCell(3).textContent = lesson.dayOfWeek;
+      row.insertCell(4).textContent = lesson.timeSlot;
+      row.insertCell(5).textContent = courseType;
+      row.insertCell(6).textContent = course.name;
+      this.reset();
+    }
+  });
+
+  document.getElementById('scheduleForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const professorId = Number(document.getElementById('professorIdSchedule').value);
+    const scheduleItems = getProfessorSchedule(professorId);
+
+    const scheduleList = document.getElementById('scheduleItems');
+    scheduleList.innerHTML = '';
+
+    if (scheduleItems.length === 0) {
+      const noScheduleItem = document.createElement('li');
+      noScheduleItem.textContent = 'Schedule not found.';
+      scheduleList.appendChild(noScheduleItem);
+      return;
+    }
+
+    scheduleItems.forEach(lesson => {
+      const scheduleItem = document.createElement('li');
+      scheduleItem.textContent = `Course ID: ${lesson.courseId}, Classroom: ${lesson.classroomNumber}, Day: ${lesson.dayOfWeek}, Time: ${lesson.timeSlot}`;
+      scheduleList.appendChild(scheduleItem);
+    });
+  });
+
+  document.getElementById('availableClassroomsForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const timeSlot = document.getElementById('availableTimeSlot').value;
+    const dayOfWeek = document.getElementById('availableDayOfWeek').value;
+
+    const availableClassrooms = findAvailableClassrooms(timeSlot, dayOfWeek);
+
+    const availableClassroomsList = document.getElementById('availableClassroomsItems');
+    availableClassroomsList.innerHTML = '';
+
+    if (availableClassrooms.length === 0) {
+      const noClassroomItem = document.createElement('li');
+      noClassroomItem.textContent = 'No available classrooms.';
+      availableClassroomsList.appendChild(noClassroomItem);
+      return;
+    }
+
+    availableClassrooms.forEach(classroomNumber => {
+      const classroomItem = document.createElement('li');
+      classroomItem.textContent = `Classroom: ${classroomNumber}`;
+      availableClassroomsList.appendChild(classroomItem);
+    });
+  });
+
+  document.getElementById('utilizationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const classroomNumber = document.getElementById('classroomNumberUtilization').value;
+    const utilizationPercentage = getClassroomUtilization(classroomNumber);
+
+    const utilizationResult = document.getElementById('utilizationPercentage');
+    utilizationResult.textContent = `Usage of classroom ${classroomNumber}: ${utilizationPercentage.toFixed(2)}%`;
+  });
+
+  document.getElementById('getMostPopularCourseType').addEventListener('click', function() {
+    const mostPopularType = getMostPopularCourseType();
+    document.getElementById('mostPopularCourseType').textContent = `Most popular course type: ${mostPopularType}`;
+  });
+
+  document.getElementById('reassignClassroomForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const lessonId = Number(document.getElementById('lessonId').value);
+    const newClassroomNumber = document.getElementById('newClassroomNumber').value;
+
+    const result = reassignClassroom(lessonId, newClassroomNumber);
+    const resultDiv = document.getElementById('reassignmentResult');
+
+    if (result) {
+      resultDiv.textContent = `Classroom for lesson ${lessonId} reassigned to ${newClassroomNumber}.`;
+      updateLessonTable();
+    } else {
+      resultDiv.textContent = `Error for lesson with ID ${lessonId}.`;
+    }
+
+    this.reset();
+  });
+
+  function updateLessonTable() {
+    const lessonTableBody = document.getElementById('lessonTable').getElementsByTagName('tbody')[0];
+
+    lessonTableBody.innerHTML = '';
+
+    schedule.forEach(lesson => {
+      const row = lessonTableBody.insertRow();
+      row.insertCell(0).textContent = lesson.courseId.toString();
+      row.insertCell(1).textContent = lesson.professorId.toString();
+      row.insertCell(2).textContent = lesson.classroomNumber;
+      row.insertCell(3).textContent = lesson.dayOfWeek;
+      row.insertCell(4).textContent = lesson.timeSlot;
+
+      const course = courses.find(c => c.id === lesson.courseId);
+      row.insertCell(5).textContent = course ? course.type : 'Unknown course';
+    });
+  }
+
+  document.getElementById('cancelLessonForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const lessonId = Number(document.getElementById('lessonIdToCancel').value);
+    const resultDiv = document.getElementById('cancelResult');
+
+    cancelLesson(lessonId);
+
+    const lessonTableBody = document.getElementById('lessonTable').getElementsByTagName('tbody')[0];
+    lessonTableBody.innerHTML = '';
+
+    schedule.forEach(lesson => {
+      const row = lessonTableBody.insertRow();
+      row.insertCell(0).textContent = lesson.courseId.toString();
+      row.insertCell(1).textContent = lesson.professorId.toString();
+      row.insertCell(2).textContent = lesson.classroomNumber;
+      row.insertCell(3).textContent = lesson.dayOfWeek;
+      row.insertCell(4).textContent = lesson.timeSlot;
+      row.insertCell(5).textContent = lesson.type;
+    });
+
+    this.reset();
+  });
+
+
+</script>
+</body>
+</html>
