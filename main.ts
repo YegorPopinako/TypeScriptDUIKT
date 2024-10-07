@@ -67,7 +67,7 @@ function addCourse(course: Course): boolean {
         courses.push(course);
         return true;
     }
-    console.error(`Курс с ID ${course.id} уже существует.`);
+    console.error(`Course with ID ${course.id} already exists.`);
     return false;
 }
 
