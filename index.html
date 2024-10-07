@@ -32,7 +32,11 @@
 <form id="lessonForm">
   <input type="number" id="courseId" placeholder="Course ID" required>
   <input type="number" id="professorIdLesson" placeholder="Professor ID" required>
-  <input type="text" id="classroomNumber" placeholder="Classroom Number" required>
+  <label for="classroomSelect">Classroom Number:</label>
+  <select id="classroomSelect" required>
+    <option value="">Select a classroom</option>
+  </select>
+
   <select id="dayOfWeek" required>
     <option value="">Select Day of the Week</option>
     <option value="Monday">Monday</option>
@@ -133,11 +137,24 @@
   <input type="number" id="lessonId" required>
 
   <label for="newClassroomNumber">New Classroom Number:</label>
-  <input type="text" id="newClassroomNumber" required>
+  <select id="newClassroomNumber" required>
+    <option value="" disabled selected>Select a classroom</option>
+    <option value="101">101</option>
+    <option value="102">102</option>
+    <option value="103">103</option>
+    <option value="201">201</option>
+    <option value="202">202</option>
+    <option value="203">203</option>
+    <option value="301">301</option>
+    <option value="302">302</option>
+    <option value="303">303</option>
+    <option value="401">401</option>
+  </select>
 
   <button type="submit">Reassign Classroom</button>
 </form>
 <div id="reassignmentResult"></div>
+
 
 <h2>Cancel Lesson</h2>
 <form id="cancelLessonForm">
@@ -149,7 +166,6 @@
 
 <script src="main.js"></script>
 <script>
-
   document.getElementById('professorForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -197,7 +213,7 @@
       id: nextLessonId++,
       courseId: courseId,
       professorId: Number(document.getElementById('professorIdLesson').value),
-      classroomNumber: document.getElementById('classroomNumber').value,
+      classroomNumber: document.getElementById('classroomSelect').value,
       dayOfWeek: document.getElementById('dayOfWeek').value,
       timeSlot: document.getElementById('timeSlot').value
     };
@@ -271,7 +287,12 @@
     const utilizationPercentage = getClassroomUtilization(classroomNumber);
 
     const utilizationResult = document.getElementById('utilizationPercentage');
-    utilizationResult.textContent = `Usage of classroom ${classroomNumber}: ${utilizationPercentage.toFixed(2)}%`;
+
+    if (utilizationPercentage > 0) {
+      utilizationResult.textContent = `Usage of classroom ${classroomNumber}: ${utilizationPercentage.toFixed(2)}%`;
+    } else {
+      utilizationResult.textContent = '';
+    }
   });
 
   document.getElementById('getMostPopularCourseType').addEventListener('click', function() {

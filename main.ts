@@ -160,7 +160,7 @@ function getClassroomUtilization(classroomNumber: string): number {
     const classroomExists = schedule.some(lesson => lesson.classroomNumber === classroomNumber);
 
     if (!classroomExists) {
-        console.error(`Classroom ${classroomNumber} does not exist.`);
+        alert(`Classroom ${classroomNumber} does not exist.`);
         return 0;
     }
 
@@ -204,8 +204,25 @@ function cancelLesson(lessonId: number): void {
     const lessonIndex = schedule.findIndex(l => l.id === lessonId);
     if (lessonIndex !== -1) {
         schedule.splice(lessonIndex, 1);
-        console.log(`Lesson with id ${lessonId} has been canceled.`);
     } else {
-        console.error("Lesson not found");
+        alert("Lesson not found");
     }
 }
+
+function populateClassroomSelect() {
+    const classroomSelect = document.getElementById('classroomSelect') as HTMLSelectElement | null;
+
+    if (!classroomSelect) {
+        console.error("Element with id 'classroomSelect' not found.");
+        return;
+    }
+
+    classrooms.forEach(classroom => {
+        const option = document.createElement('option');
+        option.value = classroom.number;
+        option.textContent = classroom.number;
+        classroomSelect.appendChild(option);
+    });
+}
+
+window.onload = populateClassroomSelect;
