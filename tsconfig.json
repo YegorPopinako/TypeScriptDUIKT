@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
-    "outDir": "./dir", // Вихідні файли будуть збережені в кореневій директорії
-    "rootDir": "./", // Джерельні файли також знаходяться в кореневій директорії
+    "module": "es6", // Измените CommonJS на ES6
+    "outDir": "./dir",
+    "rootDir": "./ts",
     "strict": true
   },
   "include": [
-    "*.ts" // Включити всі .ts файли в кореневій директорії
+    "ts/**/*.ts"
   ],
   "exclude": [
-    "node_modules", // Виняток директорії node_modules
-    "*.d.ts" // Виняток типових декларацій, якщо є
+    "node_modules",
+    "*.d.ts"
   ]
 }
